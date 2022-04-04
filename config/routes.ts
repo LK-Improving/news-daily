@@ -14,6 +14,9 @@ export default [
         path: '/user/login',
         component: '@/pages/user/Login',
       },
+      {
+        component: '404',
+      },
     ],
   },
   {
@@ -21,5 +24,8 @@ export default [
     icon: 'smile',
     path: '/dashboard',
     component: '@/pages/dashboard',
+  },
+  {
+    component: '404',
   },
 ];
