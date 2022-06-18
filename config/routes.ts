@@ -1,12 +1,6 @@
-export default [
-  {
-    path: '/',
-    component: '@/pages/dashboard',
-    redirect: '/dashboard',
-  },
+export const defaultRoutes = [
   {
     path: '/user',
-    layout: false,
     routes: [
       {
         name: 'login',
@@ -19,13 +13,34 @@ export default [
       },
     ],
   },
+];
+
+const layoutRoutes = [
   {
-    name: 'dashboard',
-    icon: 'smile',
-    path: '/dashboard',
-    component: '@/pages/dashboard',
-  },
-  {
-    component: '404',
+    exact: true,
+    component: '@/layouts/DefaultLayout',
+    routes: [
+      {
+        path: '/',
+        redirect: '/dashboard',
+      },
+      {
+        name: 'dashboard',
+        icon: 'smile',
+        path: '/dashboard',
+        component: '@/pages/dashboard',
+      },
+      {
+        name: 'foo',
+        icon: 'smile',
+        path: '/foo',
+        component: '@/pages/foo',
+      },
+      {
+        component: '404',
+      },
+    ],
   },
 ];
+
+export default defaultRoutes.concat(layoutRoutes);

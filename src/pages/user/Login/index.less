@@ -8,23 +8,48 @@
   padding: 100px 0;
   background-color: @body-background;
   background-size: 100% 100%;
-}
-
-.title {
-  font-size: 24px;
-  text-align: center;
-}
-
-.content {
-  min-width: 330px;
-  margin: 0 auto;
-  button {
-    width: 100%;
+  .title {
+    font-size: 24px;
+    text-align: center;
+    p {
+      font-size: 32px;
+      color: white;
+    }
+  }
+  .content {
+    min-width: 330px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: white;
+    .captcha {
+      display: flex;
+      img {
+        width: 150px;
+        padding-left: 10px;
+        border-radius: 32px;
+      }
+    }
+    span {
+      border-radius: 32px;
+    }
+    button {
+      width: 100%;
+    }
   }
 }
 
 @media (max-width: @screen-md) {
   .container {
-    background: deepskyblue;
+    //background-image: linear-gradient(to right top, #1890ff, #00b7ff, #00d4e0, #00e688, #a8eb12);
+    .content {
+      background: transparent;
+      .loginImg {
+        display: none;
+        position: fixed;
+      }
+    }
   }
 }

@@ -6,9 +6,10 @@ export default defineConfig({
   nodeModulesTransform: {
     type: 'none',
   },
-  layout: {
-    ...defaultSettings,
-  },
+  // // antdPro配置
+  // layout: {
+  //   ...defaultSettings,
+  // },
   routes: routes,
   fastRefresh: {},
   mfsu: {},
