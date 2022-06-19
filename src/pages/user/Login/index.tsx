@@ -1,18 +1,24 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Input, Button, Checkbox, message, Image } from 'antd';
+import { Form, Input, Button, Checkbox, message } from 'antd';
 import { PictureOutlined } from '@ant-design/icons';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import styles from './index.less';
-import { queryCurrentUser, login, reqCaptcha } from '@/services/api';
+import {
+  queryCurrentUser,
+  login,
+  reqCaptcha,
+  reqUserInfo,
+} from '@/services/api';
 import { history, useModel } from 'umi';
 import { ReactComponent as Logo } from '@/assets/images/login/undraw_newspaper_re_syf5 (1).svg';
 import { getUUID } from '@/utils';
 import { baseUrl } from '@/utils/http';
-import { setToken } from '@/utils/cookie';
+import { getToken, removeToken, setToken } from '@/utils/cookie';
 
 const Login: React.FC = () => {
   const [captchaPath, setCaptchaPath] = useState<string>('');
   const [uuid, setUuid] = useState<string>('');
+  const { initialState, setInitialState } = useModel('@@initialState');
 
   useEffect(() => {
     getCaptcha();
@@ -26,34 +32,26 @@ const Login: React.FC = () => {
   };
 
   const getUserInfo = async () => {
-    // const userInfo = await initialState?.reqUserInfo?.();
-    // console.log(userInfo);
-    // if (userInfo) {
-    //   await setInitialState((s) => ({
-    //     ...s,
-    //     currentUser: userInfo
-    //   }));
+    const userInfo = await initialState?.queryCurrentUser?.();
+    if (userInfo) message.success(`欢迎回来，${userInfo.username}!`);
+    await setInitialState((s: any) => {
+      return {
+        ...s,
+        currentUser: userInfo,
+      };
+    });
   };
-
-  // queryCurrentUser().then((res:any) => {
-  //   console.log(res);
-  // }).catch((err) => {
-  //   message.error('查询用户失败。请重试！')
-  // });
-  // }
 
   const handleSubmit = async (values: API.LoginParams) => {
     values.uuid = uuid;
-    console.log('Success:', values);
     await login({ ...values }).then((res: any) => {
       if (res && res.code === 0) {
         if (!history) return;
         const { query } = history.location;
         const { redirect } = query as { redirect: string };
-        const expire = new Date(new Date().getTime() + res.expire * 6000);
-        console.log(expire);
+        const expire = new Date(new Date().getTime() + res.expire * 1000);
         setToken('token', res.token, { path: '/', expire });
-        // getUserInfo()
+        getUserInfo();
         history.push(redirect || '/');
       } else {
         getCaptcha();
