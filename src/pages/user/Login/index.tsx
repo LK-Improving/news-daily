@@ -14,15 +14,16 @@ import { ReactComponent as Logo } from '@/assets/images/login/undraw_newspaper_r
 import { getUUID } from '@/utils';
 import { baseUrl } from '@/utils/http';
 import { getToken, removeToken, setToken } from '@/utils/cookie';
+import { useMount } from 'ahooks';
 
 const Login: React.FC = () => {
   const [captchaPath, setCaptchaPath] = useState<string>('');
   const [uuid, setUuid] = useState<string>('');
   const { initialState, setInitialState } = useModel('@@initialState');
 
-  useEffect(() => {
+  useMount(() => {
     getCaptcha();
-  }, []);
+  });
 
   // 获取验证码
   const getCaptcha = async () => {

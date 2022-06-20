@@ -11,3 +11,7 @@ export const reqUserInfo = () => get('/sys/user/info');
 
 // 查询当前用户
 export const queryCurrentUser = () => get('/currentUser');
+
+// 登录
+export const updatePassword = (value: object) =>
+  post('/sys/user/password', value);
