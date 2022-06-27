@@ -1,20 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Form, Input, Button, Checkbox, message } from 'antd';
 import { PictureOutlined } from '@ant-design/icons';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import styles from './index.less';
-import {
-  queryCurrentUser,
-  login,
-  reqCaptcha,
-  reqUserInfo,
-} from '@/services/api';
+import { login } from '@/services/api';
 import { history, useModel } from 'umi';
 import { ReactComponent as Logo } from '@/assets/images/login/undraw_newspaper_re_syf5 (1).svg';
 import { getUUID } from '@/utils';
 import { baseUrl } from '@/utils/http';
-import { getToken, removeToken, setToken } from '@/utils/cookie';
+import { setToken } from '@/utils/cookie';
 import { useMount } from 'ahooks';
+
+type LoginResType = {
+  expire: number;
+  token: string;
+} & {
+  [P in keyof API.ResultType]: API.ResultType[P];
+};
 
 const Login: React.FC = () => {
   const [captchaPath, setCaptchaPath] = useState<string>('');
@@ -45,24 +47,19 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (values: API.LoginParams) => {
     values.uuid = uuid;
-    await login({ ...values }).then((res: any) => {
-      if (res && res.code === 0) {
-        if (!history) return;
-        const { query } = history.location;
-        const { redirect } = query as { redirect: string };
-        const expire = new Date(new Date().getTime() + res.expire * 1000);
-        setToken('token', res.token, { path: '/', expire });
-        getUserInfo();
-        history.push(redirect || '/');
-      } else {
-        getCaptcha();
-        message.error(res.msg);
-      }
-    });
-  };
-
-  const onFinishFailed = (errorInfo: any) => {
-    console.log('Failed:', errorInfo);
+    const res = (await login({ ...values })) as LoginResType;
+    if (res && res.code === 0) {
+      if (!history) return;
+      const { query } = history.location;
+      const { redirect } = query as { redirect: string };
+      const expire = new Date(new Date().getTime() + res.expire * 1000);
+      setToken('token', res.token, { path: '/', expire });
+      getUserInfo();
+      history.push(redirect || '/');
+    } else {
+      getCaptcha();
+      message.error(res.msg);
+    }
   };
 
   return (
@@ -132,4 +129,5 @@ const Login: React.FC = () => {
     </div>
   );
 };
+
 export default Login;

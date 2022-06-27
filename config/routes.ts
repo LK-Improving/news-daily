@@ -1,46 +1,63 @@
-export const defaultRoutes = [
+const defaultRoutes: Array<any> = [
   {
-    path: '/user',
+    path: 'user',
     routes: [
       {
         name: 'login',
-        icon: 'smile',
         path: '/user/login',
-        component: '@/pages/user/Login',
+        component: '@/pages/user/login',
+        title: '后台登录',
+        meta: { title: '登录' },
       },
       {
         component: '404',
+        name: '404',
+        title: '404未找到',
+        meta: { title: '404未找到' },
       },
     ],
   },
 ];
 
-const layoutRoutes = [
-  {
-    exact: true,
-    component: '@/layouts/DefaultLayout',
-    routes: [
-      {
-        path: '/',
-        redirect: '/dashboard',
-      },
-      {
-        name: 'dashboard',
-        icon: 'smile',
-        path: '/dashboard',
-        component: '@/pages/dashboard',
-      },
-      {
-        name: 'foo',
-        icon: 'smile',
-        path: '/foo',
-        component: '@/pages/foo',
-      },
-      {
-        component: '404',
-      },
-    ],
-  },
-];
+export const layoutRoutes: any = {
+  // path: '/',
+  // redirect: '/dashboard',
+  exact: true,
+  component: '@/layouts/DefaultLayout',
+  routes: [
+    {
+      path: '/',
+      redirect: '/dashboard',
+    },
+    {
+      name: 'dashboard',
+      title: '工作台',
+      path: '/dashboard',
+      component: '@/pages/dashboard',
+    },
+    {
+      name: 'foo',
+      title: 'foo',
+      path: '/foo',
+      component: '@/pages/foo',
+    },
+    // {
+    //   path: '/sys',
+    //   title: '系统管理',
+    //   routes: [
+    //     // { path: '/sys/user', title: '管理员列表', component: '@/pages/sys/user'  },
+    //     // { path: '/sys/role', title: '角色管理', component: '@/pages/sys/role'},
+    //     // { path: '/sys/menu', title: '菜单管理', component: '@/pages/sys/menu'  },
+    //     { path: '/sys/log', title: '系统日志', component: '@/pages/sys/log' },
+    //   ],
+    // },
+    {
+      component: '404',
+      name: '404',
+      title: '404未找到',
+      meta: { title: '404未找到' },
+    },
+  ],
+};
 
 export default defaultRoutes.concat(layoutRoutes);

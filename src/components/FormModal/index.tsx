@@ -18,7 +18,7 @@ const FormModal: React.FC<ModelProps> = (props) => {
   const [form] = Form.useForm();
 
   useMount(() => {
-    console.log(props);
+    // console.log(props);
   });
 
   const onReset = () => {
