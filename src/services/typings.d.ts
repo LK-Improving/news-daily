@@ -1,3 +1,5 @@
+import React from 'react';
+
 declare namespace API {
   // 登录传参
   type LoginParams = {
@@ -12,6 +14,15 @@ declare namespace API {
     code: number;
     msg: string;
   };
+  // 路由
+  type routeType = {
+    component?: Promise<React.FC> | string;
+    exact?: boolean;
+    name?: string;
+    path: string;
+    title?: string;
+    routes?: Array<routeType>;
+  };
   // 管理员信息
   type UserInfoType = {
     createTime: string;
@@ -25,7 +36,7 @@ declare namespace API {
     userId: number;
     username: string;
   };
-  // 路由信息
+  // 菜单信息
   type menuType = {
     icon: string;
     list: Array<menuType>;

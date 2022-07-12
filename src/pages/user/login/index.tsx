@@ -10,6 +10,7 @@ import { getUUID } from '@/utils';
 import { baseUrl } from '@/utils/http';
 import { setToken } from '@/utils/cookie';
 import { useMount } from 'ahooks';
+import { API } from '@/services/typings';
 
 type LoginResType = {
   expire: number;

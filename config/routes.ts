@@ -1,4 +1,6 @@
-const defaultRoutes: Array<any> = [
+import { API } from '@/services/typings';
+
+const defaultRoutes: Array<object> = [
   {
     path: 'user',
     routes: [
@@ -7,19 +9,17 @@ const defaultRoutes: Array<any> = [
         path: '/user/login',
         component: '@/pages/user/login',
         title: '后台登录',
-        meta: { title: '登录' },
       },
       {
         component: '404',
         name: '404',
         title: '404未找到',
-        meta: { title: '404未找到' },
       },
     ],
   },
 ];
 
-export const layoutRoutes: any = {
+export const layoutRoutes = {
   // path: '/',
   // redirect: '/dashboard',
   exact: true,
@@ -55,7 +55,6 @@ export const layoutRoutes: any = {
       component: '404',
       name: '404',
       title: '404未找到',
-      meta: { title: '404未找到' },
     },
   ],
 };
