@@ -11,8 +11,8 @@ declare namespace API {
   };
   // 返回类型
   type ResultType = {
-    code: number;
-    msg: string;
+    code?: number;
+    msg?: string;
   };
   // 路由
   type routeType = {

@@ -1,20 +1,17 @@
 import React, { useState } from 'react';
 import { useBoolean, useDebounce, useMount, useThrottle } from 'ahooks';
 import { Button, Form, Input, message, Modal } from 'antd';
-import { FormInstance } from 'antd/lib/form/hooks/useForm';
 import { updatePassword } from '@/services/api';
 
-export type ModelProps = {
+interface ModelProps {
   title: string;
   visible: boolean;
-  setVisible: undefined | Function;
+  setVisible: Function;
   username?: string;
-  item?: object | undefined;
-};
+}
 
 const FormModal: React.FC<ModelProps> = (props) => {
   const [confirmLoading, { set: setConfirmLoading }] = useBoolean(false);
-
   const [form] = Form.useForm();
 
   useMount(() => {
@@ -37,11 +34,10 @@ const FormModal: React.FC<ModelProps> = (props) => {
         message.error(res.msg);
         setConfirmLoading(false);
       }
-    }, 2000);
+    }, 1000);
   };
 
   const handleCancel = () => {
-    // @ts-ignore
     props.setVisible(false);
     setConfirmLoading(false);
     onReset();
@@ -118,7 +114,6 @@ const FormModal: React.FC<ModelProps> = (props) => {
           ]}
         >
           <Input.Password />
-          {/*{debounceValue}*/}
         </Form.Item>
       </Form>
     </Modal>

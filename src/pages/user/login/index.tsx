@@ -8,7 +8,7 @@ import { history, useModel } from 'umi';
 import { ReactComponent as Logo } from '@/assets/images/login/undraw_newspaper_re_syf5 (1).svg';
 import { getUUID } from '@/utils';
 import { baseUrl } from '@/utils/http';
-import { setToken } from '@/utils/cookie';
+import { setCookie } from '@/utils/cookie';
 import { useMount } from 'ahooks';
 import { API } from '@/services/typings';
 
@@ -54,7 +54,7 @@ const Login: React.FC = () => {
       const { query } = history.location;
       const { redirect } = query as { redirect: string };
       const expire = new Date(new Date().getTime() + res.expire * 1000);
-      setToken('token', res.token, { path: '/', expire });
+      setCookie('token', res.token, { path: '/', expire });
       getUserInfo();
       history.push(redirect || '/');
     } else {

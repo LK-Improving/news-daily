@@ -18,10 +18,6 @@ interface DataType {
   username: string;
 }
 
-interface Params {
-  val: String;
-}
-
 type sysLogResType = {
   page: {
     currPage: number;

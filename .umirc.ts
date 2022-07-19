@@ -1,6 +1,5 @@
 import { defineConfig } from 'umi';
 import routes from './config/routes';
-
 export default defineConfig({
   mfsu: {},
   nodeModulesTransform: {
@@ -10,6 +9,9 @@ export default defineConfig({
   theme: {
     // 春梅红
     'primary-color': '#e98e97',
+  },
+  define: {
+    loginPath: '/user/login',
   },
   fastRefresh: {},
 });

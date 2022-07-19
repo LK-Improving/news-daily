@@ -1,6 +1,4 @@
-import { API } from '@/services/typings';
-
-const defaultRoutes: Array<object> = [
+const defaultRoutes: Array<React.ReactNode> = [
   {
     path: 'user',
     routes: [

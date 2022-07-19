@@ -7,18 +7,14 @@
 
 import cookie from 'react-cookies';
 
-export const setToken = (
-  key: string = 'token',
-  val: string,
-  config?: object,
-) => {
+export const setCookie = (key: string, val: string, config?: object) => {
   cookie.save(key, val, config);
 };
 
-export const getToken = (key: string = 'token'): string => {
+export const getCookie = (key: string): string => {
   return cookie.load(key);
 };
 
-export const removeToken = (key: string = 'token', config?: object): string => {
+export const removeCookie = (key: string, config?: object): string => {
   return cookie.remove(key, config);
 };
