@@ -1,5 +1,6 @@
 import { post, get } from '@/utils/http';
 import { API } from '@/services/typings';
+import Role from '@/pages/sys/role';
 
 // 登录
 export const login = (value: API.LoginParams) => post('/sys/login', value);
@@ -28,3 +29,20 @@ export const reqMenuDel = (id: number) => post(`/sys/menu/delete/${id}`);
 
 // 修改菜单
 export const reqMenuUpdate = (value: object) => post('/sys/menu/update', value);
+
+export const roleApi = {
+  // 获取角色列表
+  reqRoleList: (value: object) => get('/sys/role/list', value),
+
+  // 添加角色
+  reqRoleSave: (value: object) => post('/sys/role/save', value),
+
+  // 删除角色
+  reqRoleDel: (value: number[]) => post(`/sys/role/delete`, value),
+
+  // 修改角色
+  reqRoleUpdate: (value: object) => post('/sys/role/update', value),
+
+  // 获取角色信息
+  reqRoleInfo: (value: number) => get(`/sys/role/info/${value}`),
+};

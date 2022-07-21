@@ -41,7 +41,6 @@ export function treeDataTranslate(data: any[], id = 'id', pid = 'parentId') {
       res.push(data[k]);
     }
   }
-  console.log(res);
   return res;
 }
 

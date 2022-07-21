@@ -7,10 +7,10 @@ import MenuAddOrUpdate from '@/pages/sys/menu/components/menu-add-or-update';
 import Styles from './index.less';
 import { treeDataTranslate } from '@/utils';
 
-export interface DataType {
+export interface MenuType {
   menuId?: number;
   icon?: string;
-  list?: Array<DataType>;
+  list?: Array<MenuType>;
   name?: string;
   open?: string;
   orderNum?: number;
@@ -19,13 +19,13 @@ export interface DataType {
   perms?: any;
   type?: number;
   url?: string;
-  children?: Array<DataType>;
+  children?: Array<MenuType>;
 }
 
-const menu: React.FC = () => {
+const Menu: React.FC = () => {
   const [visible, setVisible] = useState<boolean>(false);
 
-  const [dataForm, setDataForm] = useState<DataType>({
+  const [dataForm, setDataForm] = useState<MenuType>({
     icon: '',
     name: '',
     orderNum: 0,
@@ -34,12 +34,16 @@ const menu: React.FC = () => {
     url: '',
   });
 
-  const [menuList, setMenuList] = useState<Array<DataType>>([]);
+  const [menuList, setMenuList] = useState<Array<MenuType>>([]);
 
   const confirm = async (val: number) => {
     const res = await reqMenuDel(val);
     if (res && res.code === 0) {
-      message.success('删除成功！');
+      message.success({
+        content: '删除成功',
+        duration: 1,
+        onClose: getMenuList(),
+      });
       getMenuList();
     }
   };
@@ -49,7 +53,7 @@ const menu: React.FC = () => {
   };
 
   const getMenuList = async () => {
-    const res = (await reqMenuList()) as Array<DataType>;
+    const res = (await reqMenuList()) as Array<MenuType>;
     const tempList = res.filter((item) => item.type !== 2);
     console.log(tempList);
     setMenuList(treeDataTranslate(tempList, 'menuId'));
@@ -59,7 +63,7 @@ const menu: React.FC = () => {
     getMenuList();
   });
 
-  const columns: ColumnsType<DataType> = [
+  const columns: ColumnsType<MenuType> = [
     { title: '名称', width: 130, dataIndex: 'name', key: 'name' },
     {
       title: '上级菜单',
@@ -160,4 +164,4 @@ const menu: React.FC = () => {
   );
 };
 
-export default menu;
+export default Menu;

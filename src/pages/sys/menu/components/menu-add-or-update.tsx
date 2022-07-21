@@ -12,10 +12,10 @@ import {
 } from 'antd';
 import { useBoolean, useMount } from 'ahooks';
 import { reqMenuSave, reqMenuUpdate } from '@/services/api';
-import { DataType } from '@/pages/sys/menu';
+import { MenuType } from '@/pages/sys/menu';
 
 interface ModelProps {
-  dataForm: DataType;
+  dataForm: MenuType;
   visible: boolean;
   setVisible: Function;
   setDataForm: Function;
@@ -75,7 +75,6 @@ const MenuAddOrUpdate: React.FC<ModelProps> = (props) => {
         setConfirmLoading(false);
       }, 1000);
     }
-    props.getMenuList();
   };
 
   const handleCancel = () => {
