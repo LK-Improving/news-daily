@@ -18,12 +18,7 @@ import {
   TreeSelect,
 } from 'antd';
 import { useBoolean, useGetState, useMount } from 'ahooks';
-import {
-  reqMenuList,
-  reqMenuSave,
-  reqMenuUpdate,
-  roleApi,
-} from '@/services/api';
+import { menuApi, roleApi } from '@/services/api';
 import { RoleType } from '@/pages/sys/role';
 import { treeDataTranslate } from '@/utils';
 import { MenuType } from '@/pages/sys/menu';
@@ -33,7 +28,7 @@ export type event = { init: (id: number) => void };
 
 interface ModelProps {
   event: MutableRefObject<event>;
-  getRoleList: Function;
+  refreshDataList: Function;
 }
 
 const RoleAddOrUpdate: React.FC<ModelProps> = (props) => {
@@ -58,14 +53,14 @@ const RoleAddOrUpdate: React.FC<ModelProps> = (props) => {
     dataForm.menuIdList!,
   );
 
-  const onFinishFailed = (errorInfo: any) => {
-    console.log('Failed:', errorInfo);
-  };
   // 初始化
   const init = async (id: number) => {
+    setDataForm({ ...dataForm, roleId: id | 0 });
     await getTreeData();
-    if (id) {
-      const res = (await roleApi.reqRoleInfo(id)) as API.ResultType & {
+    if (getDataForm().roleId) {
+      const res = (await roleApi.reqRoleInfo(
+        getDataForm().roleId!,
+      )) as API.ResultType & {
         role: RoleType;
       };
       if (res && res.code === 0) {
@@ -100,7 +95,7 @@ const RoleAddOrUpdate: React.FC<ModelProps> = (props) => {
           message.success({
             content: '添加成功',
             duration: 1,
-            onClose: props.getRoleList(),
+            onClose: props.refreshDataList(),
           });
           handleCancel();
         } else {
@@ -116,7 +111,7 @@ const RoleAddOrUpdate: React.FC<ModelProps> = (props) => {
           message.success({
             content: '修改成功',
             duration: 1,
-            onClose: props.getRoleList(),
+            onClose: props.refreshDataList(),
           });
           handleCancel();
         } else {
@@ -136,7 +131,7 @@ const RoleAddOrUpdate: React.FC<ModelProps> = (props) => {
 
   // 获取树结构数据
   const getTreeData = async () => {
-    const res = (await reqMenuList()) as Array<MenuType>;
+    const res = (await menuApi.reqMenuList()) as Array<MenuType>;
     const tempList = res.filter((item) => item.type !== 2);
     setTreeData(treeDataTranslate(tempList, 'menuId'));
   };
@@ -164,7 +159,6 @@ const RoleAddOrUpdate: React.FC<ModelProps> = (props) => {
       confirmLoading={confirmLoading}
     >
       <Form
-        name="basic"
         form={form}
         labelCol={{ span: 4 }}
         wrapperCol={{ span: 20 }}

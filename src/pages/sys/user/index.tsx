@@ -1,36 +1,56 @@
-import React, { useState } from 'react';
-import { Button, Form, Input, Pagination, Table, Tooltip } from 'antd';
-import { reqSysLogList } from '@/services/api';
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  Button,
+  Form,
+  Input,
+  message,
+  Pagination,
+  Popconfirm,
+  Space,
+  Table,
+  Tag,
+} from 'antd';
 import { ColumnsType } from 'antd/es/table';
-import { API } from '@/services/typings';
-import { useMount } from 'ahooks';
-import { PaginationConfig } from 'antd/es/pagination';
+import { userApi } from '@/services/api';
+import { useBoolean, useMount } from 'ahooks';
 import Styles from './index.less';
+import { PaginationConfig } from 'antd/es/pagination';
+import UserAddOrUpdate, {
+  event,
+} from '@/pages/sys/user/components/user-add-or-update';
+import { RoleType } from '@/pages/sys/role';
 
-interface DataType {
-  createDate: string;
-  id: number;
-  ip: string;
-  method: string;
-  operation: string;
-  params: string;
-  time: number;
+export interface UserType {
+  createTime: string;
+  createUserId: number;
+  email: string;
+  mobile: string;
+  password: string;
+  roleIdList: Array<RoleType>;
+  salt: string;
+  status: number;
+  userId: number;
   username: string;
 }
 
-type sysLogResType = {
-  page: {
-    currPage: number;
-    list: Array<DataType>;
-    pageSize: number;
-    totalCount: number;
-    totalPage: number;
-  };
-} & API.ResultType;
+const User: React.FC = () => {
+  const [addOrUpdateVisible, { set: setAddOrUpdateVisible }] =
+    useBoolean(false);
 
-const Log: React.FC = () => {
-  const [data, setData] = useState<DataType[]>([]);
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+
+  const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
+    setSelectedRowKeys(newSelectedRowKeys);
+  };
+
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: onSelectChange,
+  };
+  const hasSelected = selectedRowKeys.length > 0;
+
   const [loading, setLoading] = useState(false);
+
   const [pagination, setPagination] = useState<PaginationConfig>({
     current: 1,
     pageSize: 10,
@@ -39,70 +59,51 @@ const Log: React.FC = () => {
   });
   const [form] = Form.useForm();
 
-  const columns: ColumnsType<DataType> = [
-    {
-      title: 'ID',
-      dataIndex: 'id',
-      key: 'id',
-    },
-    {
-      title: '用户名',
-      dataIndex: 'username',
-      key: 'username',
-    },
-    {
-      title: '用户操作',
-      dataIndex: 'operation',
-      key: 'operation',
-    },
-    {
-      title: '请求方法',
-      dataIndex: 'method',
-      key: 'method',
-      ellipsis: {
-        showTitle: false,
-      },
-      render: (params) => (
-        <Tooltip placement="topLeft" title={params}>
-          {params}
-        </Tooltip>
-      ),
-    },
-    {
-      title: '请求参数',
-      dataIndex: 'params',
-      key: 'params',
-      ellipsis: {
-        showTitle: false,
-      },
-      render: (params) => (
-        <Tooltip placement="topLeft" title={params}>
-          {params}
-        </Tooltip>
-      ),
-    },
-    {
-      title: '执行时长（毫秒）',
-      dataIndex: 'time',
-      key: 'time',
-    },
-    {
-      title: 'IP地址',
-      dataIndex: 'ip',
-      key: 'ip',
-      // render: text => <a>{text}</a>,
-    },
-    {
-      title: '创建时间',
-      dataIndex: 'createDate',
-      key: 'createDate',
-    },
-  ];
+  const [userList, setUserList] = useState<Array<UserType>>([]);
 
-  useMount(() => {
-    form.submit();
-  });
+  let event = useRef({} as event);
 
+  // 添加/修改
+  const addOrUpdateHandle = async (id: number) => {
+    await setAddOrUpdateVisible(true);
+    event.current.init(id);
+  };
+
+  // 删除操作
+  const deleteHandle = async (val: number[]) => {
+    setLoading(true);
+    const res = await userApi.reqUserDel(val);
+    setTimeout(() => {
+      if (res && res.code === 0) {
+        message.success({
+          content: '删除成功',
+          duration: 1,
+          onClose: getUserList(),
+        });
+      } else {
+        message.error(res.msg);
+      }
+      setLoading(false);
+    }, 1000);
+  };
+
+  const cancel = () => {
+    message.warning('您取消了操作！');
+  };
+  // 获取角色列表
+  const getUserList = async () => {
+    let params = {
+      page: 1,
+      limit: 10,
+      roleName: '',
+    };
+    const res = (await userApi.reqUserList(params)) as any;
+
+    console.log(res);
+    setUserList(res.page.list);
+  };
+
+  // 提交表单
   const onFinish = async (values: {
     key?: string;
     limit?: number;
@@ -111,8 +112,8 @@ const Log: React.FC = () => {
     values['limit'] = pagination.pageSize;
     values['page'] = pagination.current;
     setLoading(true);
-    const res = (await reqSysLogList(values)) as sysLogResType;
-    setData(res.page.list);
+    const res = (await userApi.reqUserList(values)) as any;
+    setUserList(res.page.list);
     setPagination({
       current: res.page.currPage,
       pageSize: res.page.pageSize,
@@ -120,7 +121,7 @@ const Log: React.FC = () => {
     });
     setLoading(false);
   };
-
+  // 修改分页操作
   const handleTableChange = (page: number, pageSize: number) => {
     setPagination({
       current: page,
@@ -129,6 +130,58 @@ const Log: React.FC = () => {
     form.submit();
   };
 
+  useMount(() => {
+    form.submit();
+  });
+
+  const columns: ColumnsType<UserType> = [
+    { title: 'ID', dataIndex: 'userId', key: 'userId' },
+    { title: '用户名', dataIndex: 'username', key: 'username' },
+    { title: '邮箱', dataIndex: 'email', key: 'email' },
+    { title: '手机号', dataIndex: 'mobile', key: 'mobile' },
+    {
+      title: '类型',
+      dataIndex: 'status',
+      key: 'type',
+      render: (params) => (
+        <Tag color={params.status === 0 ? 'blue' : 'green'}>
+          {params.status === 0 ? '禁用' : '正常'}
+        </Tag>
+      ),
+    },
+    { title: '创建时间', dataIndex: 'createTime', key: 'createTime' },
+    {
+      title: '操作',
+      dataIndex: '',
+      width: 130,
+      align: 'center',
+      fixed: 'right',
+      key: 'userId',
+      render: (params) => (
+        <Space>
+          <a
+            onClick={() => {
+              addOrUpdateHandle(params.userId);
+            }}
+          >
+            编辑
+          </a>
+          <Popconfirm
+            title={`您确定要对[id = ${params.userId}]进行删除操作码？`}
+            onConfirm={() => {
+              deleteHandle([params.userId]);
+            }}
+            onCancel={cancel}
+            okText="删除"
+            cancelText="取消"
+          >
+            <a href="#">删除</a>
+          </Popconfirm>
+        </Space>
+      ),
+    },
+  ];
+
   return (
     <div className={Styles.container}>
       <Form
@@ -136,27 +189,55 @@ const Log: React.FC = () => {
         form={form}
         layout={'inline'}
         onFinish={onFinish}
-        initialValues={{ key: '' }}
+        initialValues={{ roleName: '' }}
         autoComplete="off"
       >
-        <Form.Item name="key">
-          <Input placeholder={'用户名 / 用户操作'} />
+        <Form.Item name="username">
+          <Input placeholder={'用户名'} />
         </Form.Item>
 
-        <Form.Item wrapperCol={{ offset: 4, span: 20 }}>
-          <Button type="primary" htmlType="submit" loading={loading}>
-            查询
-          </Button>
+        <Form.Item wrapperCol={{ offset: 2, span: 20 }}>
+          <Space>
+            <Button type="primary" htmlType="submit" loading={loading}>
+              查询
+            </Button>
+
+            <Button
+              type={'default'}
+              loading={loading}
+              onClick={() => {
+                addOrUpdateHandle(0);
+              }}
+            >
+              新增
+            </Button>
+
+            <Button
+              danger={true}
+              disabled={!hasSelected}
+              loading={loading}
+              onClick={() => {
+                deleteHandle(
+                  selectedRowKeys.map((item) => parseInt(item as string)),
+                );
+              }}
+            >
+              批量删除
+            </Button>
+          </Space>
         </Form.Item>
       </Form>
 
       <Table
         columns={columns}
-        rowKey={(record) => record.id}
-        dataSource={data}
+        rowKey={(record) => record.userId!.toString()}
+        bordered={true}
+        rowSelection={rowSelection}
         loading={loading}
+        dataSource={userList}
         pagination={false}
         className={Styles.table}
+        scroll={{ x: 800 }}
       />
 
       <Pagination
@@ -170,8 +251,11 @@ const Log: React.FC = () => {
         showTotal={(total) => `共 ${total} 条`}
         className={Styles.Pagination}
       />
+      {addOrUpdateVisible ? (
+        <UserAddOrUpdate event={event} refreshDataList={getUserList} />
+      ) : null}
     </div>
   );
 };
 
-export default Log;
+export default User;

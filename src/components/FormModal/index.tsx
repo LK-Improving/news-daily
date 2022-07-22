@@ -70,16 +70,13 @@ const FormModal: React.FC<ModelProps> = (props) => {
       confirmLoading={confirmLoading}
     >
       <Form
-        name="basic"
         form={form}
         labelCol={{ span: 4 }}
         wrapperCol={{ span: 20 }}
         onFinish={onFinish}
         autoComplete="off"
       >
-        <Form.Item label="用户名" name="username">
-          {props.username}
-        </Form.Item>
+        <Form.Item label="用户名">{props.username}</Form.Item>
 
         <Form.Item
           label="原密码"
@@ -106,9 +103,9 @@ const FormModal: React.FC<ModelProps> = (props) => {
               validator: (rule, value, callback) => {
                 const { newPassword } = form.getFieldsValue();
                 if (value !== newPassword) {
-                  callback('两次密码不一致哦，亲！');
+                  return Promise.reject('两次密码不一致哦，亲！');
                 }
-                callback();
+                return Promise.resolve();
               },
             },
           ]}

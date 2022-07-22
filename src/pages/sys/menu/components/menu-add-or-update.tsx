@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { MutableRefObject, useImperativeHandle, useState } from 'react';
 import {
   Button,
   Form,
@@ -10,47 +10,87 @@ import {
   Radio,
   TreeSelect,
 } from 'antd';
-import { useBoolean, useMount } from 'ahooks';
-import { reqMenuSave, reqMenuUpdate } from '@/services/api';
+import { useBoolean, useGetState } from 'ahooks';
+import { menuApi, userApi } from '@/services/api';
 import { MenuType } from '@/pages/sys/menu';
+import { API } from '@/services/typings';
+import { UserType } from '@/pages/sys/user';
+import { treeDataTranslate } from '@/utils';
+
+export type event = { init: (id: number) => void };
 
 interface ModelProps {
-  dataForm: MenuType;
-  visible: boolean;
-  setVisible: Function;
-  setDataForm: Function;
-  item?: object;
-  menuList?: Array<any>;
-  getMenuList: Function;
+  event: MutableRefObject<event>;
+  refreshDataList: Function;
 }
 
 const MenuAddOrUpdate: React.FC<ModelProps> = (props) => {
   const [confirmLoading, { set: setConfirmLoading }] = useBoolean(false);
-  const [type, setType] = useState<number>(props.dataForm.type!);
+
+  const [visible, setVisible] = useState<boolean>(false);
+
+  const [menuList, setMenuList] = useState<Array<MenuType>>([]);
+
+  const [type, setType] = useState<number>(1);
+
+  const [dataForm, setDataForm, getDataForm] = useGetState<MenuType>({
+    icon: '',
+    name: '',
+    orderNum: 0,
+    parentId: 0,
+    type: 1,
+    url: '',
+  });
+
   const [form] = Form.useForm();
 
-  const onReset = () => {
-    form.resetFields();
-    props.setDataForm({
-      icon: '',
-      name: '',
-      orderNum: 0,
-      parentId: 0,
-      type: 1,
-      url: '',
-    });
+  const getMenuList = async () => {
+    const res = (await menuApi.reqMenuList()) as Array<MenuType>;
+    const tempList = res.filter((item) => item.type !== 2);
+    console.log(tempList);
+    setMenuList(treeDataTranslate(tempList, 'menuId'));
   };
 
+  // 初始化
+  const init = async (id: number) => {
+    setDataForm({ ...dataForm, menuId: id | 0 });
+    await getMenuList();
+    if (getDataForm().menuId) {
+      const res = (await menuApi.reqMenuInfo(
+        getDataForm().menuId!,
+      )) as API.ResultType & {
+        menu: MenuType;
+      };
+      if (res && res.code === 0) {
+        setType(res.menu.type!);
+        form.setFieldsValue({
+          menuId: res.menu.menuId,
+          name: res.menu.name,
+          type: res.menu.type,
+          parentId: res.menu.parentId,
+          url: res.menu.url,
+          orderNum: res.menu.orderNum,
+          icon: res.menu.icon,
+        });
+      }
+    }
+    setVisible(true);
+  };
+
+  useImperativeHandle(props.event, () => ({
+    init,
+  }));
+
   const onFinish = async (val: any) => {
-    if (val.menuId === undefined) {
+    if (!val.menuId) {
       setConfirmLoading(true);
-      const res: any = await reqMenuSave(val);
+      const res: any = await menuApi.reqMenuSave(val);
       setTimeout(() => {
         if (res && res.code === 0) {
           message.success({
             content: '添加成功',
             duration: 1,
-            onClose: props.getMenuList(),
+            onClose: props.refreshDataList(),
           });
           handleCancel();
         } else {
@@ -60,13 +100,13 @@ const MenuAddOrUpdate: React.FC<ModelProps> = (props) => {
       }, 1000);
     } else {
       setConfirmLoading(true);
-      const res: any = await reqMenuUpdate(val);
+      const res: any = await menuApi.reqMenuUpdate(val);
       setTimeout(() => {
         if (res && res.code === 0) {
           message.success({
             content: '修改成功',
             duration: 1,
-            onClose: props.getMenuList(),
+            onClose: props.refreshDataList(),
           });
           handleCancel();
         } else {
@@ -78,15 +118,15 @@ const MenuAddOrUpdate: React.FC<ModelProps> = (props) => {
   };
 
   const handleCancel = () => {
-    props.setVisible(false);
+    setVisible(false);
     setConfirmLoading(false);
-    onReset();
+    form.resetFields();
   };
 
   return (
     <Modal
-      title={props.dataForm.menuId ? '修改' : '添加'}
-      visible={props.visible}
+      title={dataForm.menuId ? '修改' : '添加'}
+      visible={visible}
       onCancel={handleCancel}
       footer={
         <Form.Item>
@@ -96,10 +136,7 @@ const MenuAddOrUpdate: React.FC<ModelProps> = (props) => {
             onClick={form.submit}
             htmlType="submit"
           >
-            Submit
-          </Button>
-          <Button htmlType="button" onClick={onReset}>
-            Reset
+            确定
           </Button>
           <Button type="link" htmlType="button" onClick={handleCancel}>
             取消
@@ -115,11 +152,12 @@ const MenuAddOrUpdate: React.FC<ModelProps> = (props) => {
         wrapperCol={{ span: 20 }}
         onFinish={onFinish}
         autoComplete="off"
-        initialValues={props.dataForm}
+        initialValues={dataForm}
       >
         <Form.Item name="menuId" hidden={true}>
           <Input />
         </Form.Item>
+
         <Form.Item label="类型" name="type">
           <Radio.Group
             onChange={(e) => {
@@ -152,7 +190,7 @@ const MenuAddOrUpdate: React.FC<ModelProps> = (props) => {
               {
                 name: '一级菜单',
                 menuId: '0',
-                children: props.menuList,
+                children: menuList,
               },
             ]}
             placeholder="Please select"
@@ -184,7 +222,7 @@ const MenuAddOrUpdate: React.FC<ModelProps> = (props) => {
             title="选一个喜欢的图标吧！"
             placement={'topLeft'}
           >
-            <Input defaultValue={props.dataForm.icon} />
+            <Input />
           </Popover>
         </Form.Item>
       </Form>

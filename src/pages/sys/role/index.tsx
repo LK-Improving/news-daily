@@ -236,7 +236,7 @@ const Role: React.FC = () => {
         className={Styles.Pagination}
       />
       {addOrUpdateVisible ? (
-        <RoleAddOrUpdate event={event} getRoleList={getRoleList} />
+        <RoleAddOrUpdate event={event} refreshDataList={getRoleList} />
       ) : null}
     </div>
   );

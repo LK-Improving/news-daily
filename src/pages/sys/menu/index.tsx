@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Button, message, Popconfirm, Space, Table, Tag } from 'antd';
 import { ColumnsType } from 'antd/es/table';
-import { reqMenuDel, reqMenuList } from '@/services/api';
-import { useMount } from 'ahooks';
-import MenuAddOrUpdate from '@/pages/sys/menu/components/menu-add-or-update';
+import { useBoolean, useMount } from 'ahooks';
+import MenuAddOrUpdate, {
+  event,
+} from '@/pages/sys/menu/components/menu-add-or-update';
 import Styles from './index.less';
 import { treeDataTranslate } from '@/utils';
+import { menuApi } from '@/services/api';
 
 export interface MenuType {
   menuId?: number;
@@ -23,21 +25,22 @@ export interface MenuType {
 }
 
 const Menu: React.FC = () => {
-  const [visible, setVisible] = useState<boolean>(false);
-
-  const [dataForm, setDataForm] = useState<MenuType>({
-    icon: '',
-    name: '',
-    orderNum: 0,
-    parentId: 0,
-    type: 1,
-    url: '',
-  });
+  const [addOrUpdateVisible, { set: setAddOrUpdateVisible }] =
+    useBoolean(false);
 
   const [menuList, setMenuList] = useState<Array<MenuType>>([]);
 
-  const confirm = async (val: number) => {
-    const res = await reqMenuDel(val);
+  let event = useRef({} as event);
+
+  // 添加/修改操作
+  const addOrUpdateHandle = async (id: number) => {
+    await setAddOrUpdateVisible(true);
+    event.current.init(id);
+  };
+
+  // 删除操作
+  const deleteHandle = async (val: number) => {
+    const res = await menuApi.reqMenuDel(val);
     if (res && res.code === 0) {
       message.success({
         content: '删除成功',
@@ -53,7 +56,7 @@ const Menu: React.FC = () => {
   };
 
   const getMenuList = async () => {
-    const res = (await reqMenuList()) as Array<MenuType>;
+    const res = (await menuApi.reqMenuList()) as Array<MenuType>;
     const tempList = res.filter((item) => item.type !== 2);
     console.log(tempList);
     setMenuList(treeDataTranslate(tempList, 'menuId'));
@@ -110,8 +113,7 @@ const Menu: React.FC = () => {
         <Space>
           <a
             onClick={() => {
-              setDataForm(params);
-              setVisible(true);
+              addOrUpdateHandle(params.menuId);
             }}
           >
             编辑
@@ -119,7 +121,7 @@ const Menu: React.FC = () => {
           <Popconfirm
             title={`您确定要对[id = ${params.menuId}]进行删除操作码？`}
             onConfirm={() => {
-              confirm(params.menuId);
+              deleteHandle(params.menuId);
             }}
             onCancel={cancel}
             okText="删除"
@@ -137,7 +139,7 @@ const Menu: React.FC = () => {
       <Button
         type={'primary'}
         onClick={() => {
-          setVisible(true);
+          addOrUpdateHandle(0);
         }}
       >
         新增
@@ -150,15 +152,8 @@ const Menu: React.FC = () => {
         pagination={false}
         className={Styles.table}
       />
-      {visible ? (
-        <MenuAddOrUpdate
-          dataForm={dataForm}
-          setDataForm={setDataForm}
-          visible={visible}
-          setVisible={setVisible}
-          menuList={menuList}
-          getMenuList={getMenuList}
-        />
+      {addOrUpdateVisible ? (
+        <MenuAddOrUpdate event={event} refreshDataList={getMenuList} />
       ) : null}
     </div>
   );
