@@ -16,11 +16,12 @@ declare namespace API {
   };
   // 路由
   type routeType = {
-    component?: Promise<React.FC> | string;
+    component?: Promise<React.FC> | string | null;
     exact?: boolean;
     name?: string;
     path: string;
     title?: string;
+    meta: any;
     routes?: Array<routeType>;
   };
   // 管理员信息

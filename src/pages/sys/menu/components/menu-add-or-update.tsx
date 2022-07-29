@@ -203,14 +203,15 @@ const MenuAddOrUpdate: React.FC<ModelProps> = (props) => {
           ></TreeSelect>
         </Form.Item>
 
-        <Form.Item
-          label="菜单URL"
-          name="url"
-          rules={[{ required: true, message: '菜单URl不能为空!' }]}
-          hidden={type === 0}
-        >
-          <Input />
-        </Form.Item>
+        {type === 1 ? (
+          <Form.Item
+            label="菜单URL"
+            name="url"
+            rules={[{ required: true, message: '菜单URl不能为空!' }]}
+          >
+            <Input />
+          </Form.Item>
+        ) : null}
 
         <Form.Item label="排序号" name="orderNum">
           <InputNumber min={0} />

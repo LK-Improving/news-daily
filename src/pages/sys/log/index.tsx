@@ -6,6 +6,7 @@ import { API } from '@/services/typings';
 import { useMount } from 'ahooks';
 import { PaginationConfig } from 'antd/es/pagination';
 import Styles from './index.less';
+import Audit from '@/pages/article/audit';
 
 interface DataType {
   createDate: string;
@@ -174,6 +175,7 @@ const Log: React.FC = () => {
         showTotal={(total) => `共 ${total} 条`}
         className={Styles.Pagination}
       />
+      <Audit />
     </div>
   );
 };

@@ -50,11 +50,8 @@ export type routeType = {
   component?: Promise<Function>;
 };
 // 额外的理由
-let extraRoutes: object[] = [];
+let extraRoutes: API.routeType[] = [];
 
-const fnCurrentRouteType = (path: string, routes: routeType) => {
-  console.log(path, routes);
-};
 // 定义全局变量表示是否已添加动态路由
 // @ts-ignore
 global.isAddDynamicMenuRoutes = false;
@@ -71,81 +68,79 @@ export async function render(oldRender: Function) {
     !global.isAddDynamicMenuRoutes &&
     history.location.pathname != '/user/login'
   ) {
-    // @ts-ignore
-    global.isAddDynamicMenuRoutes = true;
-    const { menuList } = (await reqSideBarMenu()) as MenuResType;
-    // 根据后端返回数据，创建额外路由结构
-    extraRoutes = menuList.map((item: API.menuType) => {
-      let route: API.routeType = {
-        path: `/${item.url}`,
-        title: `${item.name}`,
-      };
-      // 判断该菜单路由是否存在子路由
-      if (item.list.length > 0) {
-        route.routes = item.list.map((item2: API.menuType) => {
-          let value: API.routeType = {
-            path: `/${item2.url}`,
-            title: `${item2.name}`,
-            exact: true,
-          };
-          // 动态加载组件
-          value.component = dynamic({
-            loader: () => {
-              let result = import(`@/pages/${item2.url}`);
-              return result
-                .then((res) => {
-                  if (res) {
-                    // 如果页面存在则正常返回页面路径
-                    return import(`@/pages/${item2.url}`);
-                  }
-                })
-                .catch((e) => {
-                  if (e) {
-                    // 页面不存在，默认返回404页面
-                    return import(
-                      /* webpackChunkName: 'p__temp' */ 'E:/Git_Repositories/news-daily/src/pages/temp'
-                    );
-                  }
-                });
-              // import(`@/pages/${item2.url}`) ||
-              // return import(/* webpackChunkName: 'p__404' */'E:/Git_Repositories/news-daily/src/pages/404')
-            },
-          });
-          // value.component = require('@/extraRoutes/foo').default  || null
-
-          return value;
-        });
-      } else {
-        route.name = 'foo';
-        route.component = dynamic({
-          loader: () => {
-            let result = import(`@/pages/${item.url}`);
-            return result
-              .then((res) => {
-                if (res) {
-                  // 如果页面存在则正常返回页面路径
-                  return import(`@/pages/${item.url}`);
-                }
-              })
-              .catch((e) => {
-                if (e) {
-                  // 页面不存在，默认返回404页面
-                  return import(
-                    /* webpackChunkName: 'p__404' */ 'E:/Git_Repositories/news-daily/src/pages/temp'
-                  );
-                }
-              });
-            // import(`@/pages/${item2.url}`) ||
-            // return import(/* webpackChunkName: 'p__404' */'E:/Git_Repositories/news-daily/src/pages/404')
-          },
-        });
-      }
-
-      return route;
-    });
+    const { code, menuList, permissions } =
+      (await reqSideBarMenu()) as MenuResType;
+    if (code !== undefined && code === 0) {
+      fnAddDynamicMenuRoutes(menuList);
+      // @ts-ignore
+      global.isAddDynamicMenuRoutes = true;
+      sessionStorage.setItem('menuList', JSON.stringify(menuList || '[]'));
+      sessionStorage.setItem(
+        'permissions',
+        JSON.stringify(permissions || '[]'),
+      );
+    } else {
+      sessionStorage.setItem('menuList', '[]');
+      sessionStorage.setItem('permissions', '[]');
+    }
   }
   oldRender();
 }
+
+/**
+ *
+ * @param menuList 菜单列表
+ * @param routes 涤葵创建的动态(菜单)路由
+ */
+const fnAddDynamicMenuRoutes = (
+  menuList: API.menuType[],
+  routes: API.routeType[] = [],
+) => {
+  let temp: API.menuType[] = [];
+  for (let i = 0; i < menuList.length; i++) {
+    if (menuList[i].list && menuList[i].list.length >= 1) {
+      temp = temp.concat(menuList[i].list);
+    } else if (menuList[i].url && /\S/.test(menuList[i].url)) {
+      menuList[i].url = menuList[i].url.replace(/^\//, '');
+      var route: API.routeType = {
+        path: `/${menuList[i].url}`,
+        component: null,
+        title: menuList[i].name,
+        name: menuList[i].url.replace('/', '-'),
+        meta: {
+          menuId: menuList[i].menuId,
+          isDynamic: true,
+        },
+      };
+      try {
+        route['component'] = dynamic({
+          loader: () => {
+            let result = import(`@/pages/${menuList[i].url}`);
+            return result
+              .then((result) => {
+                // 如果页面存在则正常返回页面路径
+                return import(`@/pages/${menuList[i].url}`);
+              })
+              .catch((e) => {
+                // 页面不存在，默认返回temp页面
+                return import(`@/pages/temp`);
+              });
+          },
+        });
+      } catch (e) {}
+      routes.push(route);
+    }
+  }
+  if (temp.length >= 1) {
+    fnAddDynamicMenuRoutes(temp, routes);
+  } else {
+    extraRoutes = routes;
+    sessionStorage.setItem(
+      'dynamicMenuRoutes',
+      JSON.stringify(extraRoutes || '[]'),
+    );
+  }
+};
 
 // 动态路由
 export function patchRoutes({ routes }: any, isReset = false) {
@@ -156,5 +151,4 @@ export function patchRoutes({ routes }: any, isReset = false) {
   if (extraRoutes.length > 0) {
     routes[1].routes.splice(3, 0, ...extraRoutes);
   }
-  extraRoutes = [];
 }
