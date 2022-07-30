@@ -3,6 +3,7 @@ import { reqSideBarMenu, reqUserInfo } from './services/api';
 import { history, dynamic } from 'umi';
 import { API } from '@/services/typings';
 import { layoutRoutes } from '../config/routes';
+import { LOGIN_PATH } from '@/models/contant';
 
 type resUserInfoType = {
   user: API.UserInfoType;
@@ -23,12 +24,12 @@ export async function getInitialState(): Promise<{
       const data = (await reqUserInfo()) as resUserInfoType;
       return data.user;
     } catch (error) {
-      history.push(loginPath);
+      history.push(LOGIN_PATH);
     }
     return undefined;
   };
   // 如果是登录页面，不执行
-  if (history.location.pathname !== loginPath) {
+  if (history.location.pathname !== LOGIN_PATH) {
     const currentUser = await queryCurrentUser();
 
     return {
@@ -55,6 +56,7 @@ let extraRoutes: API.routeType[] = [];
 // 定义全局变量表示是否已添加动态路由
 // @ts-ignore
 global.isAddDynamicMenuRoutes = false;
+
 /*
  * todo
  *  问题描述： 首次渲染组件加载失败，登陆后进入主页先渲染而非修改路由
@@ -63,25 +65,28 @@ export async function onRouteChange({ routes }: any) {}
 
 export async function render(oldRender: Function) {
   // 判断是否添加动态路由且当前路由部位登录页
-  // @ts-ignore
   if (
+    // @ts-ignore
     !global.isAddDynamicMenuRoutes &&
-    history.location.pathname != '/user/login'
+    history.location.pathname !== LOGIN_PATH
   ) {
-    const { code, menuList, permissions } =
-      (await reqSideBarMenu()) as MenuResType;
-    if (code !== undefined && code === 0) {
-      fnAddDynamicMenuRoutes(menuList);
-      // @ts-ignore
-      global.isAddDynamicMenuRoutes = true;
-      sessionStorage.setItem('menuList', JSON.stringify(menuList || '[]'));
-      sessionStorage.setItem(
-        'permissions',
-        JSON.stringify(permissions || '[]'),
-      );
-    } else {
-      sessionStorage.setItem('menuList', '[]');
-      sessionStorage.setItem('permissions', '[]');
+    const { currentUser } = await getInitialState();
+    if (currentUser) {
+      const { code, menuList, permissions } =
+        (await reqSideBarMenu()) as MenuResType;
+      if (code !== undefined && code === 0) {
+        fnAddDynamicMenuRoutes(menuList);
+        // @ts-ignore
+        global.isAddDynamicMenuRoutes = true;
+        sessionStorage.setItem('menuList', JSON.stringify(menuList || '[]'));
+        sessionStorage.setItem(
+          'permissions',
+          JSON.stringify(permissions || '[]'),
+        );
+      } else {
+        sessionStorage.setItem('menuList', '[]');
+        sessionStorage.setItem('permissions', '[]');
+      }
     }
   }
   oldRender();
@@ -145,6 +150,7 @@ const fnAddDynamicMenuRoutes = (
 // 动态路由
 export function patchRoutes({ routes }: any, isReset = false) {
   console.log(routes);
+  console.log(extraRoutes);
   if (isReset) {
     routes[1] = layoutRoutes;
   }

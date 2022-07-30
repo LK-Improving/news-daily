@@ -16,5 +16,5 @@ export const getCookie = (key: string): string => {
 };
 
 export const removeCookie = (key: string, config?: object): string => {
-  return cookie.remove(key, config);
+  return cookie.remove(key);
 };

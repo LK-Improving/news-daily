@@ -69,7 +69,11 @@ const Login: React.FC = () => {
         <Logo width={500} height={300} className={styles.loginImg} />
         <Form
           name="login-form"
-          initialValues={{ remember: true }}
+          initialValues={{
+            username: 'admin',
+            password: 'admin',
+            remember: true,
+          }}
           onFinish={handleSubmit}
           style={{ width: 300 }}
         >

@@ -10,8 +10,8 @@ export default defineConfig({
     // 春梅红
     'primary-color': '#e98e97',
   },
-  define: {
-    loginPath: '/user/login',
-  },
+  // define: {
+  //   loginPath: '/user/login',
+  // },
   fastRefresh: {},
 });
