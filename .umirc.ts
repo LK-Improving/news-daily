@@ -1,5 +1,6 @@
 import { defineConfig } from 'umi';
 import routes from './config/routes';
+
 export default defineConfig({
   mfsu: {},
   nodeModulesTransform: {
@@ -14,4 +15,7 @@ export default defineConfig({
   //   loginPath: '/user/login',
   // },
   fastRefresh: {},
+  dynamicImport: {
+    loading: '@/pages/loading',
+  },
 });

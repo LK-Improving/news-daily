@@ -18,7 +18,7 @@ export const reqSideBarMenu = () => get('/sys/menu/nav');
 // 获取系统日志列表
 export const reqSysLogList = (value: object) => get('/sys/log/list', value);
 
-// 菜单相关Api
+// 菜单管理相关Api
 export const menuApi = {
   // 获取菜单
   reqMenuList: () => get('/sys/menu/list'),
@@ -36,7 +36,7 @@ export const menuApi = {
   reqMenuInfo: (value: number) => get(`/sys/menu/info/${value}`),
 };
 
-// 角色相关Api
+// 角色管理相关Api
 export const roleApi = {
   // 获取角色列表
   reqRoleList: (value: object) => get('/sys/role/list', value),
@@ -73,4 +73,40 @@ export const userApi = {
 
   // 获取管理员信息
   reqUserInfo: (value: number) => get(`/sys/user/info/${value}`),
+};
+
+// 文章管理相关接口
+export const articleApi = {
+  // 获取管理员列表
+  reqArticleList: (value: object) => get('/article/list', value),
+
+  // 添加管理员
+  reqArticleSave: (value: object) => post('/article/save', value),
+
+  // 删除管理员
+  reqArticleDel: (value: number[]) => post(`/article/delete`, value),
+
+  // 修改管理员
+  reqArticleUpdate: (value: object) => post('/article/update', value),
+
+  // 获取管理员信息
+  reqArticleInfo: (value: number) => get(`/article/info/${value}`),
+};
+
+// 文章管理相关接口
+export const articleCategoryApi = {
+  // 获取管理员列表
+  reqCategoryList: (value: object) => get('/article/category/list', value),
+
+  // 添加管理员
+  reqCategorySave: (value: object) => post('/article/category/save', value),
+
+  // 删除管理员
+  reqCategoryDel: (value: number[]) => post(`/article/category/delete`, value),
+
+  // 修改管理员
+  reqCategoryUpdate: (value: object) => post('/article/category/update', value),
+
+  // 获取管理员信息
+  reqCategoryInfo: (value: number) => get(`/article/category/info/${value}`),
 };

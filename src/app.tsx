@@ -4,6 +4,9 @@ import { history, dynamic } from 'umi';
 import { API } from '@/services/typings';
 import { layoutRoutes } from '../config/routes';
 import { LOGIN_PATH } from '@/models/contant';
+import React from 'react';
+import Temp from '@/pages/temp';
+import Loading from '@/pages/loading';
 
 type resUserInfoType = {
   user: API.UserInfoType;
@@ -57,10 +60,6 @@ let extraRoutes: API.routeType[] = [];
 // @ts-ignore
 global.isAddDynamicMenuRoutes = false;
 
-/*
- * todo
- *  问题描述： 首次渲染组件加载失败，登陆后进入主页先渲染而非修改路由
- * */
 export async function onRouteChange({ routes }: any) {}
 
 export async function render(oldRender: Function) {
@@ -124,13 +123,16 @@ const fnAddDynamicMenuRoutes = (
             return result
               .then((result) => {
                 // 如果页面存在则正常返回页面路径
-                return import(`@/pages/${menuList[i].url}`);
+                return import(
+                  /* webpackChunkName: "dynamic_component" */ `@/pages/${menuList[i].url}`
+                );
               })
               .catch((e) => {
                 // 页面不存在，默认返回temp页面
-                return import(`@/pages/temp`);
+                return import(/* webpackChunkName: "temp" */ `@/pages/temp`);
               });
           },
+          loading: Loading,
         });
       } catch (e) {}
       routes.push(route);
@@ -154,6 +156,7 @@ export function patchRoutes({ routes }: any, isReset = false) {
   if (isReset) {
     routes[1] = layoutRoutes;
   }
+
   if (extraRoutes.length > 0) {
     routes[1].routes.splice(3, 0, ...extraRoutes);
   }
