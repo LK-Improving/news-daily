@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useBoolean, useDebounce, useMount, useThrottle } from 'ahooks';
 import { Button, Form, Input, message, Modal } from 'antd';
-import { updatePassword } from '@/services/api';
+import { defaultApi } from '@/services/api';
 
 interface ModelProps {
   title: string;
@@ -25,7 +25,7 @@ const FormModal: React.FC<ModelProps> = (props) => {
   const onFinish = async ({ password, newPassword }: any) => {
     // console.log(val);
     setConfirmLoading(true);
-    const res: any = await updatePassword({ password, newPassword });
+    const res: any = await defaultApi.updatePassword({ password, newPassword });
     setTimeout(() => {
       if (res && res.code === 0) {
         message.success('修改成功');

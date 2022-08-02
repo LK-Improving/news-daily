@@ -8,6 +8,7 @@ import MenuAddOrUpdate, {
 import Styles from './index.less';
 import { treeDataTranslate } from '@/utils';
 import { menuApi } from '@/services/api';
+import { API } from '@/services/typings';
 
 export interface MenuType {
   menuId?: number;
@@ -57,9 +58,11 @@ const Menu: React.FC = () => {
 
   const getMenuList = async () => {
     const res = (await menuApi.reqMenuList()) as Array<MenuType>;
-    const tempList = res.filter((item) => item.type !== 2);
-    console.log(tempList);
-    setMenuList(treeDataTranslate(tempList, 'menuId'));
+    if (res && res.length >= 1) {
+      const tempList = res.filter((item) => item.type !== 2);
+      console.log(tempList);
+      setMenuList(treeDataTranslate(tempList, 'menuId'));
+    }
   };
 
   useMount(() => {

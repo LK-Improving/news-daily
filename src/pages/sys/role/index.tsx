@@ -11,7 +11,7 @@ import {
   Tag,
 } from 'antd';
 import { ColumnsType } from 'antd/es/table';
-import { reqSysLogList, roleApi } from '@/services/api';
+import { roleApi } from '@/services/api';
 import { useBoolean, useMount, useUpdateEffect } from 'ahooks';
 import Styles from './index.less';
 import { PaginationConfig } from 'antd/es/pagination';
@@ -74,7 +74,7 @@ const Role: React.FC = () => {
         message.success({
           content: '删除成功',
           duration: 1,
-          onClose: getRoleList(),
+          onClose: form.submit(),
         });
       } else {
         message.error(res.msg);
@@ -85,18 +85,6 @@ const Role: React.FC = () => {
 
   const cancel = () => {
     message.warning('您取消了操作！');
-  };
-  // 获取角色列表
-  const getRoleList = async () => {
-    let params = {
-      page: 1,
-      limit: 10,
-      roleName: '',
-    };
-    const res = (await roleApi.reqRoleList(params)) as any;
-
-    console.log(res);
-    setRoleList(res.page.list);
   };
 
   // 提交表单
@@ -109,13 +97,15 @@ const Role: React.FC = () => {
     values['page'] = pagination.current;
     setLoading(true);
     const res = (await roleApi.reqRoleList(values)) as any;
-    setRoleList(res.page.list);
-    setPagination({
-      current: res.page.currPage,
-      pageSize: res.page.pageSize,
-      total: res.page.totalCount,
-    });
-    setLoading(false);
+    if (res && res.code === 0) {
+      setRoleList(res.page.list);
+      setPagination({
+        current: res.page.currPage,
+        pageSize: res.page.pageSize,
+        total: res.page.totalCount,
+      });
+      setLoading(false);
+    }
   };
 
   const handleTableChange = (page: number, pageSize: number) => {
@@ -236,7 +226,7 @@ const Role: React.FC = () => {
         className={Styles.Pagination}
       />
       {addOrUpdateVisible ? (
-        <RoleAddOrUpdate event={event} refreshDataList={getRoleList} />
+        <RoleAddOrUpdate event={event} refreshDataList={form.submit} />
       ) : null}
     </div>
   );

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Form, Input, Pagination, Table, Tooltip } from 'antd';
-import { reqSysLogList } from '@/services/api';
+import { defaultApi } from '@/services/api';
 import { ColumnsType } from 'antd/es/table';
 import { API } from '@/services/typings';
 import { useMount } from 'ahooks';
@@ -116,14 +116,16 @@ const Log: React.FC = () => {
     values['limit'] = pagination.pageSize;
     values['page'] = pagination.current;
     setLoading(true);
-    const res = (await reqSysLogList(values)) as sysLogResType;
-    setData(res.page.list);
-    setPagination({
-      current: res.page.currPage,
-      pageSize: res.page.pageSize,
-      total: res.page.totalCount,
-    });
-    setLoading(false);
+    const res = (await defaultApi.reqSysLogList(values)) as sysLogResType;
+    if (res && res.code === 0) {
+      setData(res.page.list);
+      setPagination({
+        current: res.page.currPage,
+        pageSize: res.page.pageSize,
+        total: res.page.totalCount,
+      });
+      setLoading(false);
+    }
   };
 
   const handleTableChange = (page: number, pageSize: number) => {

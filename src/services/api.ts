@@ -1,22 +1,25 @@
 import { post, get } from '@/utils/http';
 import { API } from '@/services/typings';
-import Role from '@/pages/sys/role';
 
-// 登录
-export const login = (value: API.LoginParams) => post('/sys/login', value);
+export const defaultApi = {
+  // 登录
+  login: (value: API.LoginParams) => post('/sys/login', value),
 
-// 获取用户信息
-export const reqUserInfo = () => get('/sys/user/info');
+  // 登出
+  logout: () => post('/sys/logout'),
 
-// 登录
-export const updatePassword = (value: object) =>
-  post('/sys/user/password', value);
+  // 获取用户信息
+  reqUserInfo: () => get('/sys/user/info'),
 
-// 获取侧边栏菜单
-export const reqSideBarMenu = () => get('/sys/menu/nav');
+  // 修改密码
+  updatePassword: (value: object) => post('/sys/user/password', value),
 
-// 获取系统日志列表
-export const reqSysLogList = (value: object) => get('/sys/log/list', value);
+  // 获取侧边栏菜单
+  reqSideBarMenu: () => get('/sys/menu/nav'),
+
+  // 获取系统日志列表
+  reqSysLogList: (value: object) => get('/sys/log/list', value),
+};
 
 // 菜单管理相关Api
 export const menuApi = {
@@ -93,10 +96,13 @@ export const articleApi = {
   reqArticleInfo: (value: number) => get(`/article/info/${value}`),
 };
 
-// 文章管理相关接口
+// 文章分类相关接口
 export const articleCategoryApi = {
   // 获取管理员列表
   reqCategoryList: (value: object) => get('/article/category/list', value),
+
+  // 查询所有分类
+  reqCategorySelect: () => get('/article/category/select'),
 
   // 添加管理员
   reqCategorySave: (value: object) => post('/article/category/save', value),

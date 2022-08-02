@@ -3,7 +3,7 @@ import { Form, Input, Button, Checkbox, message } from 'antd';
 import { PictureOutlined } from '@ant-design/icons';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import styles from './index.less';
-import { login } from '@/services/api';
+import { defaultApi } from '@/services/api';
 import { history, useModel } from 'umi';
 import { ReactComponent as Logo } from '@/assets/images/login/undraw_newspaper_re_syf5 (1).svg';
 import { getUUID } from '@/utils';
@@ -48,7 +48,7 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (values: API.LoginParams) => {
     values.uuid = uuid;
-    const res = (await login({ ...values })) as LoginResType;
+    const res = (await defaultApi.login({ ...values })) as LoginResType;
     if (res && res.code === 0) {
       if (!history) return;
       const { query } = history.location;

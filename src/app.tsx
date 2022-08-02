@@ -1,11 +1,10 @@
 import type { Settings as LayoutSettings } from '@ant-design/pro-layout';
-import { reqSideBarMenu, reqUserInfo } from './services/api';
+import { defaultApi } from './services/api';
 import { history, dynamic } from 'umi';
 import { API } from '@/services/typings';
 import { layoutRoutes } from '../config/routes';
 import { LOGIN_PATH } from '@/models/contant';
 import React from 'react';
-import Temp from '@/pages/temp';
 import Loading from '@/pages/loading';
 
 type resUserInfoType = {
@@ -24,7 +23,7 @@ export async function getInitialState(): Promise<{
 }> {
   const queryCurrentUser = async () => {
     try {
-      const data = (await reqUserInfo()) as resUserInfoType;
+      const data = (await defaultApi.reqUserInfo()) as resUserInfoType;
       return data.user;
     } catch (error) {
       history.push(LOGIN_PATH);
@@ -72,7 +71,7 @@ export async function render(oldRender: Function) {
     const { currentUser } = await getInitialState();
     if (currentUser) {
       const { code, menuList, permissions } =
-        (await reqSideBarMenu()) as MenuResType;
+        (await defaultApi.reqSideBarMenu()) as MenuResType;
       if (code !== undefined && code === 0) {
         fnAddDynamicMenuRoutes(menuList);
         // @ts-ignore
@@ -87,8 +86,10 @@ export async function render(oldRender: Function) {
         sessionStorage.setItem('permissions', '[]');
       }
     }
+    setTimeout(oldRender(), 500);
+  } else {
+    oldRender();
   }
-  oldRender();
 }
 
 /**

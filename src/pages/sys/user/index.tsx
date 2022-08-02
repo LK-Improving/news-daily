@@ -113,13 +113,15 @@ const User: React.FC = () => {
     values['page'] = pagination.current;
     setLoading(true);
     const res = (await userApi.reqUserList(values)) as any;
-    setUserList(res.page.list);
-    setPagination({
-      current: res.page.currPage,
-      pageSize: res.page.pageSize,
-      total: res.page.totalCount,
-    });
-    setLoading(false);
+    if (res && res.code === 0) {
+      setUserList(res.page.list);
+      setPagination({
+        current: res.page.currPage,
+        pageSize: res.page.pageSize,
+        total: res.page.totalCount,
+      });
+      setLoading(false);
+    }
   };
   // 修改分页操作
   const handleTableChange = (page: number, pageSize: number) => {
