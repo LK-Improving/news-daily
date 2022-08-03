@@ -45,13 +45,6 @@ export async function getInitialState(): Promise<{
   };
 }
 
-// 路由类型
-export type routeType = {
-  path: string;
-  title: string;
-  exact: boolean;
-  component?: Promise<Function>;
-};
 // 额外的理由
 let extraRoutes: API.routeType[] = [];
 
@@ -86,10 +79,8 @@ export async function render(oldRender: Function) {
         sessionStorage.setItem('permissions', '[]');
       }
     }
-    setTimeout(oldRender(), 500);
-  } else {
-    oldRender();
   }
+  oldRender();
 }
 
 /**

@@ -23,7 +23,7 @@
     "@ant-design/icons": "^4.7.0",
     "@ant-design/pro-layout": "^6.15.3",
     "ahooks": "^3.4.0",
-    "antd": "^4.21.3",
+    "antd": "^4.22.3",
     "axios": "^0.26.1",
     "react": "17.x",
     "react-cookies": "^0.1.1",

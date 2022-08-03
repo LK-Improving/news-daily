@@ -177,7 +177,6 @@ const Log: React.FC = () => {
         showTotal={(total) => `共 ${total} 条`}
         className={Styles.Pagination}
       />
-      <Audit />
     </div>
   );
 };

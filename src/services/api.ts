@@ -81,6 +81,9 @@ export const userApi = {
 // 文章管理相关接口
 export const articleApi = {
   // 获取管理员列表
+  reqAuditList: (value: object) => get('/article/audit/list', value),
+
+  // 获取管理员列表
   reqArticleList: (value: object) => get('/article/list', value),
 
   // 添加管理员
