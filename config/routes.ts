@@ -19,25 +19,19 @@ const defaultRoutes: Array<React.ReactNode> = [
 
 export const layoutRoutes = {
   // path: '/',
-  // redirect: '/dashboard',
+  // redirect: '/home',
   exact: true,
   component: '@/layouts/DefaultLayout',
   routes: [
     {
       path: '/',
-      redirect: 'dashboard',
+      redirect: 'home',
     },
     {
-      name: 'dashboard',
-      title: '工作台',
-      path: 'dashboard',
-      component: '@/pages/dashboard',
-    },
-    {
-      name: 'foo',
-      title: 'foo',
-      path: 'foo',
-      component: '@/pages/foo',
+      name: 'home',
+      title: '首页',
+      path: 'home',
+      component: '@/pages/home',
     },
     {
       component: '404',

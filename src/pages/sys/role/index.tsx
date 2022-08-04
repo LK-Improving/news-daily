@@ -19,15 +19,7 @@ import RoleAddOrUpdate, {
   event,
 } from '@/pages/sys/role/components/role-add-or-update';
 import Login from '@/pages/user/login';
-
-export interface RoleType {
-  createTime: string;
-  createUserId: number;
-  menuIdList: Array<any>;
-  remark: string;
-  roleId: number;
-  roleName: string;
-}
+import { API } from '@/services/typings';
 
 const Role: React.FC = () => {
   const [addOrUpdateVisible, { set: setAddOrUpdateVisible }] =
@@ -55,7 +47,7 @@ const Role: React.FC = () => {
   });
   const [form] = Form.useForm();
 
-  const [roleList, setRoleList] = useState<Array<RoleType>>([]);
+  const [roleList, setRoleList] = useState<Array<API.RoleType>>([]);
 
   let event = useRef({} as event);
 
@@ -120,7 +112,7 @@ const Role: React.FC = () => {
     form.submit();
   });
 
-  const columns: ColumnsType<RoleType> = [
+  const columns: ColumnsType<API.RoleType> = [
     { title: 'ID', dataIndex: 'roleId', key: 'roleId' },
     { title: '角色名称', dataIndex: 'roleName', key: 'roleName' },
     { title: '备注', dataIndex: 'remark', key: 'remark' },

@@ -54,6 +54,10 @@ global.isAddDynamicMenuRoutes = false;
 
 export async function onRouteChange({ routes }: any) {}
 
+/**
+ * todo: 用户首次登录进入动态路由页面未更新路由就先渲染页面
+ * @param oldRender
+ */
 export async function render(oldRender: Function) {
   // 判断是否添加动态路由且当前路由部位登录页
   if (
@@ -80,6 +84,7 @@ export async function render(oldRender: Function) {
       }
     }
   }
+
   oldRender();
 }
 
@@ -150,6 +155,6 @@ export function patchRoutes({ routes }: any, isReset = false) {
   }
 
   if (extraRoutes.length > 0) {
-    routes[1].routes.splice(3, 0, ...extraRoutes);
+    routes[1].routes.splice(2, 0, ...extraRoutes);
   }
 }

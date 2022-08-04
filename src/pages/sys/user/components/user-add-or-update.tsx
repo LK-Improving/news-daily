@@ -12,10 +12,8 @@ import {
 } from 'antd';
 import { useBoolean, useGetState, useMount } from 'ahooks';
 import { roleApi, userApi } from '@/services/api';
-import { RoleType } from '@/pages/sys/role';
 import { API } from '@/services/typings';
 import { isEmail, isMobile } from '@/utils/validate';
-import { UserType } from '@/pages/sys/user';
 
 export type event = { init: (id: number) => void };
 
@@ -29,11 +27,11 @@ const UserAddOrUpdate: React.FC<ModelProps> = (props) => {
 
   const [visible, setVisible] = useState<boolean>(false);
 
-  const [roleList, setRoleList] = useState<Array<RoleType>>([]);
+  const [roleList, setRoleList] = useState<Array<API.RoleType>>([]);
 
   const [dataForm, setDataForm, getDataForm] = useGetState<
     {
-      [P in keyof UserType]?: UserType[P];
+      [P in keyof API.UserInfoType]?: API.UserInfoType[P];
     } & { checkPassword: string }
   >({
     email: '',
@@ -51,7 +49,7 @@ const UserAddOrUpdate: React.FC<ModelProps> = (props) => {
   // 查询所有角色
   const selectRoleList = async () => {
     const res = (await roleApi.reqRoleSelect()) as API.ResultType & {
-      list: Array<RoleType>;
+      list: Array<API.RoleType>;
     };
     setRoleList(res.list);
   };
@@ -64,7 +62,7 @@ const UserAddOrUpdate: React.FC<ModelProps> = (props) => {
       const res = (await userApi.reqUserInfo(
         getDataForm().userId!,
       )) as API.ResultType & {
-        user: UserType;
+        user: API.UserInfoType;
       };
       if (res && res.code === 0) {
         form.setFieldsValue({

@@ -19,7 +19,6 @@ import {
 } from 'antd';
 import { useBoolean, useGetState, useMount } from 'ahooks';
 import { menuApi, roleApi } from '@/services/api';
-import { RoleType } from '@/pages/sys/role';
 import { treeDataTranslate } from '@/utils';
 import { MenuType } from '@/pages/sys/menu';
 import { API } from '@/services/typings';
@@ -37,7 +36,7 @@ const RoleAddOrUpdate: React.FC<ModelProps> = (props) => {
   const [visible, setVisible] = useState<boolean>(false);
 
   const [dataForm, setDataForm, getDataForm] = useGetState<{
-    [P in keyof RoleType]?: RoleType[P];
+    [P in keyof API.RoleType]?: API.RoleType[P];
   }>({
     roleId: 0,
     roleName: '',
@@ -61,7 +60,7 @@ const RoleAddOrUpdate: React.FC<ModelProps> = (props) => {
       const res = (await roleApi.reqRoleInfo(
         getDataForm().roleId!,
       )) as API.ResultType & {
-        role: RoleType;
+        role: API.RoleType;
       };
       if (res && res.code === 0) {
         setCheckedKeys(res.role.menuIdList);

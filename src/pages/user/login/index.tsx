@@ -56,7 +56,8 @@ const Login: React.FC = () => {
       const expire = new Date(new Date().getTime() + res.expire * 1000);
       setCookie('token', res.token, { path: '/', expire });
       getUserInfo();
-      history.push(redirect || '/');
+      // todo: redirect || '/'
+      history.push('/' || redirect);
     } else {
       getCaptcha();
       message.error(res.msg);

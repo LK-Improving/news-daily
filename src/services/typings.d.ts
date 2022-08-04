@@ -31,12 +31,22 @@ declare namespace API {
     email: string;
     mobile: string;
     password: string;
-    roleIdList: null | string;
+    roleIdList: Array<RoleType>;
     salt: string;
     status: number;
     userId: number;
     username: string;
   };
+  // 角色类型
+  type RoleType = {
+    createTime: string;
+    createUserId: number;
+    menuIdList: Array<number>;
+    remark: string;
+    roleId: number;
+    roleName: string;
+  };
+
   // 菜单信息
   type menuType = {
     icon: string;
@@ -50,5 +60,12 @@ declare namespace API {
     perms?: string;
     type: number;
     url: string;
+  };
+
+  type CategoryType = {
+    createTime: string;
+    showStatus: number;
+    catId: number;
+    catName: string;
   };
 }

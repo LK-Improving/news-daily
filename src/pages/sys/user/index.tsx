@@ -18,20 +18,7 @@ import { PaginationConfig } from 'antd/es/pagination';
 import UserAddOrUpdate, {
   event,
 } from '@/pages/sys/user/components/user-add-or-update';
-import { RoleType } from '@/pages/sys/role';
-
-export interface UserType {
-  createTime: string;
-  createUserId: number;
-  email: string;
-  mobile: string;
-  password: string;
-  roleIdList: Array<RoleType>;
-  salt: string;
-  status: number;
-  userId: number;
-  username: string;
-}
+import { API } from '@/services/typings';
 
 const User: React.FC = () => {
   const [addOrUpdateVisible, { set: setAddOrUpdateVisible }] =
@@ -59,7 +46,7 @@ const User: React.FC = () => {
   });
   const [form] = Form.useForm();
 
-  const [userList, setUserList] = useState<Array<UserType>>([]);
+  const [userList, setUserList] = useState<Array<API.UserInfoType>>([]);
 
   let event = useRef({} as event);
 
@@ -136,7 +123,7 @@ const User: React.FC = () => {
     form.submit();
   });
 
-  const columns: ColumnsType<UserType> = [
+  const columns: ColumnsType<API.UserInfoType> = [
     { title: 'ID', dataIndex: 'userId', key: 'userId' },
     { title: '用户名', dataIndex: 'username', key: 'username' },
     { title: '邮箱', dataIndex: 'email', key: 'email' },

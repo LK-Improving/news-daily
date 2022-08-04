@@ -18,13 +18,7 @@ import { PaginationConfig } from 'antd/es/pagination';
 import CategoryAddOrUpdate, {
   event,
 } from '@/pages/article/category/components/category-add-or-update';
-
-export interface CategoryType {
-  createTime: string;
-  showStatus: number;
-  catId: number;
-  catName: string;
-}
+import { API } from '@/services/typings';
 
 const Category: React.FC = () => {
   const [addOrUpdateVisible, { set: setAddOrUpdateVisible }] =
@@ -52,7 +46,7 @@ const Category: React.FC = () => {
   });
   const [form] = Form.useForm();
 
-  const [categoryList, setCategoryList] = useState<Array<CategoryType>>([]);
+  const [categoryList, setCategoryList] = useState<Array<API.CategoryType>>([]);
 
   let event = useRef({} as event);
 
@@ -115,7 +109,7 @@ const Category: React.FC = () => {
     form.submit();
   });
 
-  const columns: ColumnsType<CategoryType> = [
+  const columns: ColumnsType<API.CategoryType> = [
     { title: 'ID', dataIndex: 'catId', key: 'catId' },
     { title: '分类名称', dataIndex: 'catName', key: 'catName' },
     {

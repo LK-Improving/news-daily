@@ -80,6 +80,9 @@ export const userApi = {
 
 // 文章管理相关接口
 export const articleApi = {
+  // 图表数据
+  reqChart: () => get('/article/chart'),
+
   // 获取管理员列表
   reqAuditList: (value: object) => get('/article/audit/list', value),
 
