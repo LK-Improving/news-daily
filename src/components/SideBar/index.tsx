@@ -81,11 +81,12 @@ const SideBar: React.FC<PropsType> = (props) => {
     }
     return itemList;
   };
-
+  // 递归渲染菜单
   const items: MenuItem[] = [
     getItem('工作台', '/home', <DesktopOutlined />),
   ].concat(
     menu.menuList.map((item, index) => {
+      // 是否含有子菜单
       if (item.list.length >= 1) {
         return getItem(
           item.name,

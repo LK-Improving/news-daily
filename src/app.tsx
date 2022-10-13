@@ -65,7 +65,6 @@ global.isAddDynamicMenuRoutes = false;
 export async function onRouteChange(routes: any) {}
 
 /**
- * todo: 用户首次登录进入动态路由页面未更新路由就先渲染页面
  * @param oldRender
  */
 export async function render(oldRender: Function) {
@@ -80,6 +79,7 @@ export async function render(oldRender: Function) {
       (await defaultApi.reqSideBarMenu()) as MenuResType;
     const app = getDvaApp();
     if (code !== undefined && code === 0) {
+      // 添加动态路由
       fnAddDynamicMenuRoutes(menuList);
       // @ts-ignore
       global.isAddDynamicMenuRoutes = true;
