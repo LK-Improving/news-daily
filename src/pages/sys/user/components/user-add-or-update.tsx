@@ -82,9 +82,11 @@ const UserAddOrUpdate: React.FC<ModelProps> = (props) => {
   }));
 
   const onFinish = async (val: typeof dataForm) => {
+    console.log(val);
     if ('checkPassword' in val) {
       Reflect.deleteProperty(val, 'checkPassword');
     }
+
     if (!val.userId) {
       setConfirmLoading(true);
       const res: any = await userApi.reqUserSave(val);
@@ -187,24 +189,23 @@ const UserAddOrUpdate: React.FC<ModelProps> = (props) => {
               ? [
                   { required: true, message: '请重新输入密码！' },
                   {
-                    validator: (rule, value) => {
+                    validator: (rule, value, callback) => {
                       const { password } = form.getFieldsValue();
-                      if (value !== password) {
-                        Promise.reject('两次密码不一致哦，亲！');
+                      if (value && value !== password) {
+                        callback('两次密码不一致哦，亲！');
                       }
-                      Promise.resolve();
+                      callback();
                     },
                   },
                 ]
               : [
                   {
-                    validator: (rule, value) => {
+                    validator: (rule, value, callback) => {
                       const { password } = form.getFieldsValue();
-                      console.log(value, password);
-                      if (value !== password) {
-                        Promise.reject('两次密码不一致哦，亲！');
+                      if (value && value !== password) {
+                        callback('两次密码不一致哦，亲！');
                       }
-                      Promise.resolve();
+                      callback();
                     },
                   },
                 ]
@@ -220,10 +221,10 @@ const UserAddOrUpdate: React.FC<ModelProps> = (props) => {
             { required: true, message: '请输入邮箱！' },
             {
               validator: (rule, value, callback) => {
-                if (!isEmail(value)) {
-                  Promise.reject('邮箱格式不对哦，亲！');
+                if (value && !isEmail(value)) {
+                  callback('邮箱格式不对哦，亲！');
                 }
-                Promise.resolve();
+                callback();
               },
             },
           ]}
@@ -238,10 +239,10 @@ const UserAddOrUpdate: React.FC<ModelProps> = (props) => {
             { required: true, message: '请输入手机号！' },
             {
               validator: (rule, value, callback) => {
-                if (!isMobile(value)) {
-                  Promise.reject('手机号格式不对哦，亲！');
+                if (value && !isMobile(value)) {
+                  callback('手机号格式不对哦，亲！');
                 }
-                Promise.resolve();
+                callback();
               },
             },
           ]}

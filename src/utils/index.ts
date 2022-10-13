@@ -1,6 +1,7 @@
 import { removeCookie } from '@/utils/cookie';
 import { patchRoutes } from '@/app';
 import { history } from 'umi';
+import { getDvaApp } from '@@/plugin-dva/exports';
 
 const routes = require('/config/routes').default;
 
@@ -48,11 +49,15 @@ export function treeDataTranslate(data: any[], id = 'id', pid = 'parentId') {
  * 清除登录信息
  */
 export function clearLoginInfo() {
-  patchRoutes({ routes }, true);
+  // patchRoutes({ routes }, true);
   removeCookie('token');
   // @ts-ignore
   global.isAddDynamicMenuRoutes = false;
+  getDvaApp()._store.dispatch({
+    type: 'menu/resetStore',
+  });
   history.push({
     pathname: '/user/login',
   });
+  window.location.reload();
 }

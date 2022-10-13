@@ -60,7 +60,6 @@ const Menu: React.FC = () => {
     const res = (await menuApi.reqMenuList()) as Array<MenuType>;
     if (res && res.length >= 1) {
       const tempList = res.filter((item) => item.type !== 2);
-      console.log(tempList);
       setMenuList(treeDataTranslate(tempList, 'menuId'));
     }
   };

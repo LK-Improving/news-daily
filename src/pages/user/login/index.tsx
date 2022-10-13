@@ -57,7 +57,8 @@ const Login: React.FC = () => {
       setCookie('token', res.token, { path: '/', expire });
       getUserInfo();
       // todo: redirect || '/'
-      history.push('/' || redirect);
+
+      history.push(redirect || '/');
     } else {
       getCaptcha();
       message.error(res.msg);

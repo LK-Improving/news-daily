@@ -108,7 +108,7 @@ export const articleCategoryApi = {
   reqCategoryList: (value: object) => get('/article/category/list', value),
 
   // 查询所有分类
-  reqCategorySelect: () => get('/article/category/select'),
+  reqCategorySelect: () => get('/article/category/all'),
 
   // 添加管理员
   reqCategorySave: (value: object) => post('/article/category/save', value),

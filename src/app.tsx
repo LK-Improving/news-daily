@@ -1,10 +1,11 @@
-import type { Settings as LayoutSettings } from '@ant-design/pro-layout';
+import React from 'react';
+import { history, dynamic, getDvaApp } from 'umi';
 import { defaultApi } from './services/api';
-import { history, dynamic } from 'umi';
+import type { Settings as LayoutSettings } from '@ant-design/pro-layout';
 import { API } from '@/services/typings';
 import { layoutRoutes } from '../config/routes';
 import { LOGIN_PATH } from '@/models/contant';
-import React from 'react';
+
 import Loading from '@/pages/loading';
 
 type resUserInfoType = {
@@ -14,6 +15,15 @@ type resUserInfoType = {
 type MenuResType = API.ResultType & {
   menuList: Array<API.menuType>;
   permissions: Array<object>;
+};
+
+export const dva = {
+  config: {
+    onError(err: any) {
+      err.preventDefault();
+      console.error(err.message);
+    },
+  },
 };
 
 export async function getInitialState(): Promise<{
@@ -52,7 +62,7 @@ let extraRoutes: API.routeType[] = [];
 // @ts-ignore
 global.isAddDynamicMenuRoutes = false;
 
-export async function onRouteChange({ routes }: any) {}
+export async function onRouteChange(routes: any) {}
 
 /**
  * todo: 用户首次登录进入动态路由页面未更新路由就先渲染页面
@@ -63,29 +73,42 @@ export async function render(oldRender: Function) {
   if (
     // @ts-ignore
     !global.isAddDynamicMenuRoutes &&
-    history.location.pathname !== LOGIN_PATH
+    history.location.pathname !== LOGIN_PATH &&
+    (await getInitialState())
   ) {
-    const { currentUser } = await getInitialState();
-    if (currentUser) {
-      const { code, menuList, permissions } =
-        (await defaultApi.reqSideBarMenu()) as MenuResType;
-      if (code !== undefined && code === 0) {
-        fnAddDynamicMenuRoutes(menuList);
-        // @ts-ignore
-        global.isAddDynamicMenuRoutes = true;
-        sessionStorage.setItem('menuList', JSON.stringify(menuList || '[]'));
-        sessionStorage.setItem(
-          'permissions',
-          JSON.stringify(permissions || '[]'),
-        );
-      } else {
-        sessionStorage.setItem('menuList', '[]');
-        sessionStorage.setItem('permissions', '[]');
-      }
+    const { code, menuList, permissions } =
+      (await defaultApi.reqSideBarMenu()) as MenuResType;
+    const app = getDvaApp();
+    if (code !== undefined && code === 0) {
+      fnAddDynamicMenuRoutes(menuList);
+      // @ts-ignore
+      global.isAddDynamicMenuRoutes = true;
+      sessionStorage.setItem('menuList', JSON.stringify(menuList || '[]'));
+      sessionStorage.setItem(
+        'permissions',
+        JSON.stringify(permissions || '[]'),
+      );
+      // 获取dva实例
+      console.log(app);
+      app &&
+        app._store.dispatch({
+          type: 'menu/setMenuList',
+          payload: menuList,
+        });
+      oldRender();
+    } else {
+      sessionStorage.setItem('menuList', '[]');
+      sessionStorage.setItem('permissions', '[]');
+      app &&
+        app._store.dispatch({
+          type: 'menu/setMenuList',
+          payload: [],
+        });
+      oldRender();
     }
+  } else {
+    oldRender();
   }
-
-  oldRender();
 }
 
 /**
@@ -157,4 +180,5 @@ export function patchRoutes({ routes }: any, isReset = false) {
   if (extraRoutes.length > 0) {
     routes[1].routes.splice(2, 0, ...extraRoutes);
   }
+  extraRoutes = [];
 }
